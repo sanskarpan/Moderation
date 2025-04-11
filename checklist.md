@@ -9,7 +9,7 @@
 - [x] Create docker-compose.yml for local development
 - [x] Setup CI/CD pipeline using GitHub Actions
 - [x] Initialize Sentry for error monitoring in both frontend and backend
-- [ ] Setup basic deployment configurations for Vercel (frontend) and Render (backend)
+- [x] Setup basic deployment configurations for Vercel (frontend) and Render (backend)
 
 ## Phase 1: Backend MVP
 - [ ] Set up Express server
