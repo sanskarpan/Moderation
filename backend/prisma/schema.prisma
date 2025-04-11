@@ -1,0 +1,93 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String           @id @default(uuid())
+  clerkId           String           @unique
+  email             String           @unique
+  username          String           @unique
+  role              Role             @default(USER)
+  emailNotification Boolean          @default(true)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  posts             Post[]
+  comments          Comment[]
+  reviews           Review[]
+  flaggedContents   FlaggedContent[]
+}
+
+model Post {
+  id        String    @id @default(uuid())
+  title     String
+  content   String
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+  reviews   Review[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Comment {
+  id             String           @id @default(uuid())
+  content        String
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId         String
+  post           Post             @relation(fields: [postId], references: [id], onDelete: Cascade)
+  flaggedContent FlaggedContent?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model Review {
+  id             String           @id @default(uuid())
+  content        String
+  rating         Int
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId         String
+  post           Post             @relation(fields: [postId], references: [id], onDelete: Cascade)
+  flaggedContent FlaggedContent?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model FlaggedContent {
+  id        String           @id @default(uuid())
+  contentId String
+  type      ContentType
+  status    ModerationStatus @default(PENDING)
+  reason    String
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  comment   Comment?         @relation(fields: [commentId], references: [id])
+  commentId String?          @unique
+  review    Review?          @relation(fields: [reviewId], references: [id])
+  reviewId  String?          @unique
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ContentType {
+  COMMENT
+  REVIEW
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
