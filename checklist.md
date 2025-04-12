@@ -12,22 +12,22 @@
 - [x] Setup basic deployment configurations for Vercel (frontend) and Render (backend)
 
 ## Phase 1: Backend MVP
-- [ ] Set up Express server
-- [ ] Configure Prisma ORM with Supabase
-- [ ] Define database models (User, Comment, Review, Post, FlaggedContent)
-- [ ] Implement Clerk authentication
-- [ ] Create auth middleware
-- [ ] Create user routes (signup, login)
-- [ ] Create content routes (post, get comments/reviews)
-- [ ] Setup Google Cloud NLP for content moderation
-- [ ] Create moderation service
-- [ ] Implement flagged content storage
+- [x] Set up Express server
+- [x] Configure Prisma ORM with Supabase
+- [x] Define database models (User, Comment, Review, Post, FlaggedContent)
+- [x] Implement Clerk authentication
+- [x] Create auth middleware
+- [x] Create user routes (signup, login)
+- [x] Create content routes (post, get comments/reviews)
+- [x] Setup Google Cloud NLP for content moderation
+- [x] Create moderation service
+- [x] Implement flagged content storage
 - [ ] Write API tests using Jest
-- [ ] Generate Swagger/OpenAPI documentation
+- [x] Generate Swagger/OpenAPI documentation
 - [ ] Create Postman collection
 
 ## Phase 2: Frontend MVP
-- [ ] Setup React application with create-react-app
+- [x] Setup React application with create-react-app
 - [ ] Configure TailwindCSS
 - [ ] Set up Shadcn UI components
 - [ ] Create global styling with variables
