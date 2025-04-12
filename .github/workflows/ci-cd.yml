@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -39,6 +43,33 @@ jobs:
   test-backend:
     runs-on: ubuntu-latest
     needs: lint
+    services:
+      # Setup Redis service for tests
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      # Setup PostgreSQL service for tests
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          
     steps:
       - uses: actions/checkout@v3
       
@@ -57,6 +88,15 @@ jobs:
           cd backend
           pnpm install
           
+      - name: Setup test database
+        run: |
+          cd backend
+          pnpm prisma generate
+          pnpm prisma db push
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_ENV: test
+          
       - name: Run tests
         run: |
           cd backend
@@ -64,6 +104,8 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test  
           
   test-frontend:
     runs-on: ubuntu-latest
@@ -92,7 +134,7 @@ jobs:
           pnpm test
         env:
           REACT_APP_API_URL: http://localhost:5000/api
-          REACT_APP_CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY }}
+          REACT_APP_CLERK_PUBLISHABLE_KEY: ${{ secrets.REACT_APP_CLERK_PUBLISHABLE_KEY }}
           
   build:
     runs-on: ubuntu-latest
@@ -132,6 +174,100 @@ jobs:
           name: frontend-build
           path: frontend/build
           
-  # deployment jobs to be added here when ready
-  # deploy-backend:
-  # deploy-frontend:
+  docker-build-and-push:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=sha,format=short
+            latest
+      
+      # Build and push backend image
+      - name: Build and push backend Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}-backend:latest,${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}-backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      # Build and push frontend image
+      - name: Build and push frontend Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:latest,${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  
+  deploy-to-kubernetes:
+    name: Deploy to Kubernetes
+    needs: docker-build-and-push
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set Kubernetes Context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      # Update image tags in deployment files
+      - name: Update deployment image
+        run: |
+          # Replace Docker registry placeholder with actual values
+          find kubernetes -type f -name "*.yaml" -exec sed -i "s|\${DOCKER_REGISTRY}|${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}|g" {} \;
+          
+          # Add SHA tag to deployment files for better tracking
+          sed -i "s|content-moderation-backend:latest|content-moderation-backend:${{ github.sha }}|g" kubernetes/backend-deployment.yaml
+          sed -i "s|content-moderation-frontend:latest|content-moderation-frontend:${{ github.sha }}|g" kubernetes/frontend-deployment.yaml
+
+      # Apply kubernetes manifests
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f kubernetes/configmap.yaml
+          kubectl apply -f kubernetes/secrets.yaml
+          kubectl apply -f kubernetes/redis-deployment.yaml
+          kubectl apply -f kubernetes/backend-deployment.yaml
+          kubectl apply -f kubernetes/frontend-deployment.yaml
+          kubectl apply -f kubernetes/horizontal-pod-autoscaler.yaml
+          kubectl apply -f kubernetes/ingress.yaml
+          
+      # Verify deployment
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/content-moderation-backend
+          kubectl rollout status deployment/content-moderation-frontend
+          
+      - name: Deployment info
+        run: |
+          echo "🚀 Deployment completed successfully!"

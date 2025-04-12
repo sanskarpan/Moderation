@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: content-moderation-redis
+  labels:
+    app: content-moderation
+    tier: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: content-moderation
+      tier: redis
+  template:
+    metadata:
+      labels:
+        app: content-moderation
+        tier: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: content-moderation-redis
+  labels:
+    app: content-moderation
+    tier: redis
+spec:
+  selector:
+    app: content-moderation
+    tier: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  labels:
+    app: content-moderation
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

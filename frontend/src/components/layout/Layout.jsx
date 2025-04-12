@@ -46,6 +46,25 @@ const Layout = () => {
     }
   }, [isDarkMode]);
 
+  // Listen for system theme changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleChange = (e) => {
+      const savedTheme = localStorage.getItem('theme');
+      // Only auto-switch if user hasn't manually set a preference
+      if (!savedTheme) {
+        setIsDarkMode(e.matches);
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, []);
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };

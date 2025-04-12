@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: content-moderation-frontend
+  labels:
+    app: content-moderation
+    tier: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: content-moderation
+      tier: frontend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: content-moderation
+        tier: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: ${DOCKER_REGISTRY}/content-moderation-frontend:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        ports:
+        - containerPort: 80
+        env:
+        - name: REACT_APP_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: content-moderation-config
+              key: api_url
+        - name: REACT_APP_CLERK_PUBLISHABLE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: content-moderation-secrets
+              key: clerk_publishable_key
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: content-moderation-frontend
+  labels:
+    app: content-moderation
+    tier: frontend
+spec:
+  selector:
+    app: content-moderation
+    tier: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP

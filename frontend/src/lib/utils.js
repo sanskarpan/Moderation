@@ -12,53 +12,90 @@ export function cn(...inputs) {
 
 /**
  * Format date to a readable string
- * @param {string|Date} date - Date to format
+ * @param {string|Date|null|undefined} dateInput - Date to format
  * @param {Object} options - Intl.DateTimeFormat options
- * @returns {string} - Formatted date
+ * @returns {string} - Formatted date or empty string if invalid
  */
-export function formatDate(date, options = {}) {
-  const defaultOptions = {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  };
-  
-  return new Intl.DateTimeFormat(
-    'en-US', 
-    { ...defaultOptions, ...options }
-  ).format(new Date(date));
+export function formatDate(dateInput, options = {}) {
+  if (!dateInput) return ''; // Return empty if date is null/undefined
+
+  try {
+    const date = new Date(dateInput);
+    // Check if the date object is valid
+    if (isNaN(date.getTime())) {
+        console.warn("Invalid date passed to formatDate:", dateInput);
+        return ''; // Return empty for invalid dates
+    }
+
+    // Use simpler default options that are widely supported
+    const defaultOptions = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      // Avoid dateStyle/timeStyle for now if causing issues
+      // hour: 'numeric',
+      // minute: 'numeric',
+    };
+
+    // Merge defaults with provided options
+    const mergedOptions = { ...defaultOptions, ...options };
+
+    return new Intl.DateTimeFormat('en-US', mergedOptions).format(date);
+  } catch (error) {
+      console.error("Error formatting date:", dateInput, error);
+      return ''; // Return empty on formatting error
+  }
 }
 
 /**
  * Format relative time (e.g., "2 hours ago")
- * @param {string|Date} date - Date to format
- * @returns {string} - Relative time string
+ * @param {string|Date|null|undefined} dateInput - Date to format
+ * @returns {string} - Relative time string or empty string if invalid
  */
-export function formatRelativeTime(date) {
-  const now = new Date();
-  const then = new Date(date);
-  const seconds = Math.floor((now - then) / 1000);
-  
-  const intervals = {
-    year: 31536000,
-    month: 2592000,
-    week: 604800,
-    day: 86400,
-    hour: 3600,
-    minute: 60,
-    second: 1
-  };
-  
-  for (const [unit, secondsInUnit] of Object.entries(intervals)) {
-    const interval = Math.floor(seconds / secondsInUnit);
-    
-    if (interval >= 1) {
-      return `${interval} ${unit}${interval === 1 ? '' : 's'} ago`;
-    }
-  }
-  
-  return 'Just now';
+export function formatRelativeTime(dateInput) {
+  if (!dateInput) return ''; // Return empty if date is null/undefined
+
+   try {
+       const now = new Date();
+       const then = new Date(dateInput);
+
+        // Check if the date object is valid
+       if (isNaN(then.getTime())) {
+           console.warn("Invalid date passed to formatRelativeTime:", dateInput);
+           return ''; // Return empty for invalid dates
+       }
+
+       const seconds = Math.floor((now.getTime() - then.getTime()) / 1000);
+
+       if (seconds < 5) { // Increased threshold for "Just now"
+           return 'Just now';
+       }
+
+       const intervals = [ // Order from largest to smallest
+           { label: 'year', seconds: 31536000 },
+           { label: 'month', seconds: 2592000 },
+           { label: 'week', seconds: 604800 },
+           { label: 'day', seconds: 86400 },
+           { label: 'hour', seconds: 3600 },
+           { label: 'minute', seconds: 60 },
+           { label: 'second', seconds: 1 }
+       ];
+
+       for (const interval of intervals) {
+           const count = Math.floor(seconds / interval.seconds);
+           if (count >= 1) {
+               return `${count} ${interval.label}${count !== 1 ? 's' : ''} ago`;
+           }
+       }
+
+       return 'Just now'; // Fallback
+
+   } catch (error) {
+       console.error("Error formatting relative time:", dateInput, error);
+       return ''; // Return empty on error
+   }
 }
+
 
 /**
  * Truncate text to a specified length

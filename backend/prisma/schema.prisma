@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,10 +16,10 @@ model User {
   emailNotification Boolean          @default(true)
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
-  posts             Post[]
   comments          Comment[]
-  reviews           Review[]
   flaggedContents   FlaggedContent[]
+  posts             Post[]
+  reviews           Review[]
 }
 
 model Post {
@@ -28,36 +27,36 @@ model Post {
   title     String
   content   String
   userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comments  Comment[]
-  reviews   Review[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  comments  Comment[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviews   Review[]
 }
 
 model Comment {
-  id             String           @id @default(uuid())
+  id             String          @id @default(uuid())
   content        String
   userId         String
-  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   postId         String
-  post           Post             @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  post           Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   flaggedContent FlaggedContent?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
 }
 
 model Review {
-  id             String           @id @default(uuid())
+  id             String          @id @default(uuid())
   content        String
   rating         Int
   userId         String
-  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   postId         String
-  post           Post             @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   flaggedContent FlaggedContent?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  post           Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model FlaggedContent {
@@ -67,13 +66,13 @@ model FlaggedContent {
   status    ModerationStatus @default(PENDING)
   reason    String
   userId    String
-  user      User             @relation(fields: [userId], references: [id])
-  comment   Comment?         @relation(fields: [commentId], references: [id])
   commentId String?          @unique
-  review    Review?          @relation(fields: [reviewId], references: [id])
   reviewId  String?          @unique
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
+  comment   Comment?         @relation(fields: [commentId], references: [id])
+  review    Review?          @relation(fields: [reviewId], references: [id])
+  user      User             @relation(fields: [userId], references: [id])
 }
 
 enum Role {
