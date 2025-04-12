@@ -1,0 +1,830 @@
+{
+    "info": {
+      "name": "Content Moderation API",
+      "description": "API collection for testing the AI-powered Content Moderation Microservice",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Auth",
+        "description": "Authentication related endpoints",
+        "item": [
+          {
+            "name": "Get Current User",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/auth/me",
+                "host": ["{{baseUrl}}"],
+                "path": ["auth", "me"]
+              },
+              "description": "Get the current authenticated user's information"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Posts",
+        "description": "Post related endpoints",
+        "item": [
+          {
+            "name": "Get All Posts",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/posts?page=1&limit=10",
+                "host": ["{{baseUrl}}"],
+                "path": ["posts"],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "userId",
+                    "value": "{{userId}}",
+                    "disabled": true
+                  }
+                ]
+              },
+              "description": "Get a list of all posts with pagination"
+            }
+          },
+          {
+            "name": "Get Post by ID",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/posts/{{postId}}",
+                "host": ["{{baseUrl}}"],
+                "path": ["posts", "{{postId}}"]
+              },
+              "description": "Get a specific post by its ID"
+            }
+          },
+          {
+            "name": "Create Post",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "type": "text"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"title\": \"Test Post Title\",\n    \"content\": \"This is the content of the test post. It's a sample post to test the API.\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/posts",
+                "host": ["{{baseUrl}}"],
+                "path": ["posts"]
+              },
+              "description": "Create a new post"
+            }
+          },
+          {
+            "name": "Update Post",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "type": "text"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"title\": \"Updated Post Title\",\n    \"content\": \"This is the updated content of the post.\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/posts/{{postId}}",
+                "host": ["{{baseUrl}}"],
+                "path": ["posts", "{{postId}}"]
+              },
+              "description": "Update an existing post"
+            }
+          },
+          {
+            "name": "Delete Post",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/posts/{{postId}}",
+                "host": ["{{baseUrl}}"],
+                "path": ["posts", "{{postId}}"]
+              },
+              "description": "Delete a post by ID"
+            }
+          },
+          {
+            "name": "Get User Posts",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/posts/user/{{userId}}?page=1&limit=10",
+                "host": ["{{baseUrl}}"],
+                "path": ["posts", "user", "{{userId}}"],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  }
+                ]
+              },
+              "description": "Get posts by a specific user"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Comments",
+        "description": "Comment related endpoints",
+        "item": [
+          {
+            "name": "Get All Comments",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/comments?page=1&limit=10",
+                "host": ["{{baseUrl}}"],
+                "path": ["comments"],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "postId",
+                    "value": "{{postId}}",
+                    "disabled": true
+                  },
+                  {
+                    "key": "userId",
+                    "value": "{{userId}}",
+                    "disabled": true
+                  }
+                ]
+              },
+              "description": "Get a list of all comments with pagination"
+            }
+          },
+          {
+            "name": "Get Comment by ID",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/comments/{{commentId}}",
+                "host": ["{{baseUrl}}"],
+                "path": ["comments", "{{commentId}}"]
+              },
+              "description": "Get a specific comment by its ID"
+            }
+          },
+          {
+            "name": "Create Comment",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "type": "text"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"content\": \"This is a test comment. I'm commenting on this post.\",\n    \"postId\": \"{{postId}}\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/comments",
+                "host": ["{{baseUrl}}"],
+                "path": ["comments"]
+              },
+              "description": "Create a new comment on a post"
+            }
+          },
+          {
+            "name": "Update Comment",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "type": "text"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"content\": \"This is an updated comment.\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/comments/{{commentId}}",
+                "host": ["{{baseUrl}}"],
+                "path": ["comments", "{{commentId}}"]
+              },
+              "description": "Update an existing comment"
+            }
+          },
+          {
+            "name": "Delete Comment",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/comments/{{commentId}}",
+                "host": ["{{baseUrl}}"],
+                "path": ["comments", "{{commentId}}"]
+              },
+              "description": "Delete a comment by ID"
+            }
+          },
+          {
+            "name": "Get User Comments",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/comments/user/{{userId}}?page=1&limit=10",
+                "host": ["{{baseUrl}}"],
+                "path": ["comments", "user", "{{userId}}"],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  }
+                ]
+              },
+              "description": "Get comments by a specific user"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Reviews",
+        "description": "Review related endpoints",
+        "item": [
+          {
+            "name": "Get All Reviews",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/reviews?page=1&limit=10",
+                "host": ["{{baseUrl}}"],
+                "path": ["reviews"],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "postId",
+                    "value": "{{postId}}",
+                    "disabled": true
+                  },
+                  {
+                    "key": "userId",
+                    "value": "{{userId}}",
+                    "disabled": true
+                  },
+                  {
+                    "key": "rating",
+                    "value": "5",
+                    "disabled": true
+                  }
+                ]
+              },
+              "description": "Get a list of all reviews with pagination"
+            }
+          },
+          {
+            "name": "Get Review by ID",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/reviews/{{reviewId}}",
+                "host": ["{{baseUrl}}"],
+                "path": ["reviews", "{{reviewId}}"]
+              },
+              "description": "Get a specific review by its ID"
+            }
+          },
+          {
+            "name": "Create Review",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "type": "text"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"content\": \"This is a test review. I'm reviewing this post.\",\n    \"rating\": 4,\n    \"postId\": \"{{postId}}\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/reviews",
+                "host": ["{{baseUrl}}"],
+                "path": ["reviews"]
+              },
+              "description": "Create a new review for a post"
+            }
+          },
+          {
+            "name": "Update Review",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "type": "text"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"content\": \"This is an updated review.\",\n    \"rating\": 5\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/reviews/{{reviewId}}",
+                "host": ["{{baseUrl}}"],
+                "path": ["reviews", "{{reviewId}}"]
+              },
+              "description": "Update an existing review"
+            }
+          },
+          {
+            "name": "Delete Review",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/reviews/{{reviewId}}",
+                "host": ["{{baseUrl}}"],
+                "path": ["reviews", "{{reviewId}}"]
+              },
+              "description": "Delete a review by ID"
+            }
+          },
+          {
+            "name": "Get User Reviews",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{baseUrl}}/reviews/user/{{userId}}?page=1&limit=10",
+                "host": ["{{baseUrl}}"],
+                "path": ["reviews", "user", "{{userId}}"],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  }
+                ]
+              },
+              "description": "Get reviews by a specific user"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Moderation",
+        "description": "Moderation related endpoints",
+        "item": [
+          {
+            "name": "Check Content",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "type": "text"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"content\": \"This is some content that I want to check for moderation.\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/moderation/check",
+                "host": ["{{baseUrl}}"],
+                "path": ["moderation", "check"]
+              },
+              "description": "Check content for moderation"
+            }
+          },
+          {
+            "name": "Get Flagged Content",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/moderation/flagged?page=1&limit=10&status=PENDING",
+                "host": ["{{baseUrl}}"],
+                "path": ["moderation", "flagged"],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "status",
+                    "value": "PENDING",
+                    "description": "Filter by status: PENDING, APPROVED, REJECTED"
+                  },
+                  {
+                    "key": "type",
+                    "value": "COMMENT",
+                    "disabled": true,
+                    "description": "Filter by type: COMMENT, REVIEW"
+                  }
+                ]
+              },
+              "description": "Get flagged content for the current user"
+            }
+          },
+          {
+            "name": "Update Email Notification Preferences",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "type": "text"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"emailNotification\": true\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/moderation/preferences",
+                "host": ["{{baseUrl}}"],
+                "path": ["moderation", "preferences"]
+              },
+              "description": "Update email notification preferences"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Admin",
+        "description": "Admin related endpoints",
+        "item": [
+          {
+            "name": "Get All Flagged Content",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/admin/flagged?page=1&limit=10&status=PENDING",
+                "host": ["{{baseUrl}}"],
+                "path": ["admin", "flagged"],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "status",
+                    "value": "PENDING",
+                    "description": "Filter by status: PENDING, APPROVED, REJECTED"
+                  },
+                  {
+                    "key": "type",
+                    "value": "COMMENT",
+                    "disabled": true,
+                    "description": "Filter by type: COMMENT, REVIEW"
+                  },
+                  {
+                    "key": "userId",
+                    "value": "{{userId}}",
+                    "disabled": true
+                  }
+                ]
+              },
+              "description": "Get all flagged content (admin only)"
+            }
+          },
+          {
+            "name": "Approve Flagged Content",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/admin/flagged/{{flaggedContentId}}/approve",
+                "host": ["{{baseUrl}}"],
+                "path": ["admin", "flagged", "{{flaggedContentId}}", "approve"]
+              },
+              "description": "Approve flagged content (admin only)"
+            }
+          },
+          {
+            "name": "Reject Flagged Content",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "type": "text"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"reason\": \"This content violates our community guidelines.\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/admin/flagged/{{flaggedContentId}}/reject",
+                "host": ["{{baseUrl}}"],
+                "path": ["admin", "flagged", "{{flaggedContentId}}", "reject"]
+              },
+              "description": "Reject flagged content (admin only)"
+            }
+          },
+          {
+            "name": "Get All Users",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/admin/users?page=1&limit=10",
+                "host": ["{{baseUrl}}"],
+                "path": ["admin", "users"],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  }
+                ]
+              },
+              "description": "Get all users (admin only)"
+            }
+          },
+          {
+            "name": "Update User Role",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "type": "text"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"role\": \"ADMIN\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/admin/users/{{userId}}/role",
+                "host": ["{{baseUrl}}"],
+                "path": ["admin", "users", "{{userId}}", "role"]
+              },
+              "description": "Update user role (admin only)"
+            }
+          },
+          {
+            "name": "Get System Stats",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}",
+                  "type": "text"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/admin/stats",
+                "host": ["{{baseUrl}}"],
+                "path": ["admin", "stats"]
+              },
+              "description": "Get system statistics (admin only)"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Health Check",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{baseUrl}}/health",
+            "host": ["{{baseUrl}}"],
+            "path": ["health"]
+          },
+          "description": "Check if the API is healthy"
+        }
+      }
+    ],
+    "event": [
+      {
+        "listen": "prerequest",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            ""
+          ]
+        }
+      },
+      {
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            ""
+          ]
+        }
+      }
+    ],
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:5000/api",
+        "type": "string"
+      },
+      {
+        "key": "token",
+        "value": "YOUR_CLERK_JWT_TOKEN",
+        "type": "string"
+      },
+      {
+        "key": "userId",
+        "value": "USER_ID",
+        "type": "string"
+      },
+      {
+        "key": "postId",
+        "value": "POST_ID",
+        "type": "string"
+      },
+      {
+        "key": "commentId",
+        "value": "COMMENT_ID",
+        "type": "string"
+      },
+      {
+        "key": "reviewId",
+        "value": "REVIEW_ID",
+        "type": "string"
+      },
+      {
+        "key": "flaggedContentId",
+        "value": "FLAGGED_CONTENT_ID",
+        "type": "string"
+      }
+    ]
+  }
