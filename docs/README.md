@@ -121,7 +121,7 @@ The API is fully documented using OpenAPI/Swagger:
 
 ### Architecture Documentation
 
-Detailed architecture documentation is available in the [/](docs) directory:
+Detailed architecture documentation is available in this sub-directory itself:
 
 - [System Overview](system-overview.md)
 - [Database Schema](database-schema.md)

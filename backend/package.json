@@ -1,7 +1,6 @@
 {
   "name": "moderation-microservice-backend",
   "version": "1.0.0",
-  "type": "module",
   "description": "Backend for the AI-powered content moderation microservice",
   "main": "src/index.js",
   "scripts": {
