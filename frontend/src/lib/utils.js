@@ -17,33 +17,37 @@ export function cn(...inputs) {
  * @returns {string} - Formatted date or empty string if invalid
  */
 export function formatDate(dateInput, options = {}) {
-  if (!dateInput) return ''; // Return empty if date is null/undefined
+  if (!dateInput) return '';
 
   try {
-    const date = new Date(dateInput);
-    // Check if the date object is valid
-    if (isNaN(date.getTime())) {
-        console.warn("Invalid date passed to formatDate:", dateInput);
-        return ''; // Return empty for invalid dates
-    }
+      const date = new Date(dateInput);
+      if (isNaN(date.getTime())) {
+          console.warn("Invalid date passed to formatDate:", dateInput);
+          return '';
+      }
 
-    // Use simpler default options that are widely supported
-    const defaultOptions = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      // Avoid dateStyle/timeStyle for now if causing issues
-      // hour: 'numeric',
-      // minute: 'numeric',
-    };
+      let formatOptions;
 
-    // Merge defaults with provided options
-    const mergedOptions = { ...defaultOptions, ...options };
+      // Check if style options are provided
+      if (options.dateStyle || options.timeStyle) {
+          // If style options exist, use ONLY them (and ignore defaults)
+          formatOptions = { ...options };
+      } else {
+          // Otherwise, use the defaults (and any other non-style options passed in)
+          const defaultOptions = {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+          };
+          formatOptions = { ...defaultOptions, ...options };
+      }
 
-    return new Intl.DateTimeFormat('en-US', mergedOptions).format(date);
+      // Use the determined options
+      return new Intl.DateTimeFormat('en-US', formatOptions).format(date);
   } catch (error) {
-      console.error("Error formatting date:", dateInput, error);
-      return ''; // Return empty on formatting error
+      // Log the specific options that caused the error for debugging
+      console.error("Error formatting date:", dateInput, "with options:", options, error);
+      return '';
   }
 }
 

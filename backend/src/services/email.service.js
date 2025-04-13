@@ -41,7 +41,7 @@ const sendEmail = async (options) => {
  */
 const sendContentFlaggedNotification = async (user, contentType, reason) => {
   if (!user.emailNotification) {
-    console.log(`Email notifications disabled for user ${user.id}`);
+    console.log(`Email notifications confirmed disabled for user ${user.id}. Skipping flagged notification.`);
     return null;
   }
 
@@ -65,7 +65,7 @@ const sendContentFlaggedNotification = async (user, contentType, reason) => {
       </p>
     </div>
   `;
-
+  console.log(`Attempting to send 'content-flagged' email to ${user.email}`);
   return sendEmail({ email: user.email, subject, html });
 };
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ClerkProvider, SignIn, SignUp, RedirectToSignIn } from '@clerk/clerk-react';
+import { ClerkProvider, SignIn, SignUp } from '@clerk/clerk-react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 // Components

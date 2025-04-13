@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
 
-const Tabs = React.forwardRef(({ className, ...props }, ref) => (
+const Tabs = React.forwardRef(({ className, onValueChange, defaultValue, ...props }, ref) => (
   <div
     ref={ref}
     className={cn("space-y-2", className)}
@@ -35,17 +35,23 @@ const TabsTrigger = React.forwardRef(({ className, active, ...props }, ref) => (
 ));
 TabsTrigger.displayName = "TabsTrigger";
 
-const TabsContent = React.forwardRef(({ className, active, ...props }, ref) => (
+const TabsContent = React.forwardRef(({ className, children, value, ...props }, ref) => (
   <div
-    ref={ref}
-    className={cn(
-      "mt-2 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:ring-offset-secondary-950",
-      !active && "hidden",
-      className
-    )}
-    {...props}
-  />
+      ref={ref}
+      // The className prop passed from PostDetailPage handles visibility
+      className={cn(
+          "mt-2 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:ring-offset-secondary-950",
+          className // This applies the 'hidden' class when needed
+      )}
+      role="tabpanel"
+      aria-labelledby={`tab-${value}`} // Example of linking trigger/panel
+      // Ensure children are always passed through
+      {...props}
+  >
+      {children}
+  </div>
 ));
 TabsContent.displayName = "TabsContent";
+
 
 export { Tabs, TabsList, TabsTrigger, TabsContent };

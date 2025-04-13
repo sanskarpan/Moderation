@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query'; // Added useMutation, useQueryClient
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { postsAPI } from '../lib/api';
 import { formatDate, formatRelativeTime } from '../lib/utils';
 import { Button } from '../components/ui/button';
@@ -22,7 +22,7 @@ const PostDetailPage = () => {
   const [activeTab, setActiveTab] = useState('comments');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteError, setDeleteError] = useState(''); // State for delete error
-
+  const { getToken } = useAuth();
   const queryClient = useQueryClient(); // Get query client instance
 
   // Fetch post data
@@ -37,23 +37,32 @@ const PostDetailPage = () => {
 
   // Delete post mutation
   const deletePostMutation = useMutation(
-    () => postsAPI.deletePost(postId),
+    // Make async and get token
+    async () => { // Doesn't need postId passed here, uses from closure
+      const token = await getToken();
+      if (!token) throw new Error("Authentication required to delete post.");
+      console.log(`PostDetailPage: Calling postsAPI.deletePost for ID: ${postId}`);
+      // Pass token to API call
+      return postsAPI.deletePost(postId, token);
+    },
     {
       onSuccess: () => {
+        console.log("PostDetailPage: deletePostMutation success");
         queryClient.invalidateQueries(['posts']); // Invalidate list of posts
         navigate('/posts'); // Navigate away after successful delete
       },
       onError: (error) => {
-        console.error('Error deleting post:', error);
-        setDeleteError(error.response?.data?.message || 'Failed to delete post. Please try again.');
+        console.error('PostDetailPage: Error deleting post:', error);
+        setDeleteError(error.response?.data?.message || error.message || 'Failed to delete post. Please try again.');
         setDeleteDialogOpen(false); // Close dialog on error
       },
     }
   );
 
   const handleDeleteConfirm = () => {
+    console.log("PostDetailPage: Confirming delete for post:", postId);
     setDeleteError(''); // Clear previous errors
-    deletePostMutation.mutate();
+    deletePostMutation.mutate(); // Trigger the mutation
   };
 
   if (isLoading) {
@@ -108,7 +117,7 @@ const PostDetailPage = () => {
 
   return (
     <div className="space-y-6">
-       {deleteError && (
+      {deleteError && (
         <Alert variant="danger" className="mb-4">
           <AlertDescription>{deleteError}</AlertDescription>
         </Alert>
@@ -196,7 +205,7 @@ const PostDetailPage = () => {
 
           <div className="flex items-center space-x-4">
              {/* Use optional chaining for user data */}
-             <Avatar>
+            <Avatar>
               <AvatarImage src={post.user?.imageUrl} alt={post.user?.username || 'User'} />
               <AvatarFallback>{post.user?.username?.substring(0, 2).toUpperCase() || '??'}</AvatarFallback>
             </Avatar>
@@ -239,9 +248,11 @@ const PostDetailPage = () => {
 
           {/* Wrap content in the TabsContent component from ui/tabs */}
           <TabsContent value="comments" className={activeTab !== 'comments' ? 'hidden' : ''}>
+          {/* {console.log("PostDetailPage - isSignedIn check:", isSignedIn)} */}
             {isSignedIn ? (
               <Card className="mb-6">
                 <CardContent className="p-6">
+
                   <h3 className="mb-4 text-lg font-medium">Leave a Comment</h3>
                   <CreateCommentForm postId={postId} />
                 </CardContent>

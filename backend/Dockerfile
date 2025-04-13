@@ -1,25 +1,29 @@
-FROM node:16-alpine
-
-# Set working directory
+FROM node:23-bullseye
 WORKDIR /app
 
-# Install pnpm globally
+# Install OS deps Prisma needs (OpenSSL + build tools)
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      openssl \
+      python3 \
+      make \
+      g++ \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install pnpm
 RUN npm install -g pnpm
 
-# Copy package.json and pnpm-lock.yaml
+# Copy package manifests & install
 COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile
 
-# Install dependencies
-RUN pnpm install
+# Copy Prisma schema & generate client using the *local* CLI
+COPY prisma ./prisma/
+RUN pnpm prisma generate
 
-# Generate Prisma client
-RUN pnpm dlx prisma generate
-
-# Copy the rest of the app
+# Copy the rest of your source
 COPY . .
 
-# Expose port
+# Expose & launch
 EXPOSE 5000
-
-# Start the app
 CMD ["pnpm", "run", "dev"]

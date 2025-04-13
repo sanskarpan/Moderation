@@ -52,11 +52,11 @@ router.post('/', validate(createCommentSchema), async (req, res) => {
   const { content, postId } = req.body; // Validation ensures these exist
 
   // Middleware should guarantee localUser exists if requireAuth is used globally
-   if (!req.localUser || !req.localUser.id) {
-       console.error('Error: POST /comments route reached without req.localUser.id populated.');
+  if (!req.localUser || !req.localUser.id) {
+      console.error('Error: POST /comments route reached without req.localUser.id populated.');
        // This indicates a middleware setup issue if requireAuth was intended
-       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Could not identify user to create comment.' });
-   }
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Could not identify user to create comment.' });
+  }
 
   try {
     // Check if post exists

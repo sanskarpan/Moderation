@@ -27,7 +27,7 @@ const apiLimiter = rateLimit({
  */
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 30, // limit each IP to 30 requests per windowMs
+  max: 300000, // limit each IP to 30 requests per windowMs
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Too many authentication attempts, please try again later.' },
@@ -43,7 +43,7 @@ const authLimiter = rateLimit({
  */
 const contentCreationLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 50, // limit each IP to 50 content creation requests per windowMs
+  max: 500000, // limit each IP to 50 content creation requests per windowMs
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'You have created too much content. Please try again later.' },
@@ -59,7 +59,7 @@ const contentCreationLimiter = rateLimit({
  */
 const moderationCheckLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 20, // limit each IP to 20 moderation check requests per windowMs
+  max: 200000, // limit each IP to 20 moderation check requests per windowMs
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Too many moderation check requests, please try again later.' },

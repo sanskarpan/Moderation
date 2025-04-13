@@ -4,8 +4,11 @@ import { moderationAPI } from '../../lib/api';
 import { formatRelativeTime, cn } from '../../lib/utils';
 import { Button } from './button';
 import { Badge } from './badge';
+import { useAuth } from '@clerk/clerk-react';
+
 
 const NotificationCenter = () => {
+  const { getToken } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [readNotifications, setReadNotifications] = useState(() => {
@@ -18,9 +21,15 @@ const NotificationCenter = () => {
   // Fetch flagged content as notifications
   const { data } = useQuery(
     ['user-flagged-notifications'],
-    () => moderationAPI.getFlaggedContent({ limit: 10 }),
+    async () => { // <-- Make the query function async
+      const token = await getToken(); // <-- Get the token
+      if (!token) return null; // <-- Handle case where user logs out or token unavailable
+      // Pass the token to your API call
+      return moderationAPI.getFlaggedContent({ limit: 10 }, token);
+    },
     {
-      refetchInterval: 60000, // Refetch every minute
+      refetchInterval: 60000,
+      // enabled: isAuthLoaded && isSignedIn // <-- Optionally enable only when auth is ready
     }
   );
 
