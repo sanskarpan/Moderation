@@ -1,7 +1,5 @@
 # AI-Powered Content Moderation Microservice
 
-![Content Moderation Banner](https://i.imgur.com/VHhlTGQ.png)
-
 A production-ready content moderation microservice that uses AI to detect and flag inappropriate content, built with a modern PERN stack (PostgreSQL, Express, React, Node.js).
 
 
@@ -123,12 +121,12 @@ The API is fully documented using OpenAPI/Swagger:
 
 ### Architecture Documentation
 
-Detailed architecture documentation is available in the [/docs](docs) directory:
+Detailed architecture documentation is available in the [/](docs) directory:
 
-- [System Overview](docs/system-overview.md)
-- [Database Schema](docs/database-schema.md)
-- [Queue System](docs/queue-system.md)
-- [Security Implementation](docs/security.md)
+- [System Overview](system-overview.md)
+- [Database Schema](database-schema.md)
+- [Queue System](queue-system.md)
+- [Security Implementation](security.md)
 
 ## Deployment
 
@@ -139,7 +137,7 @@ The application is deployed across multiple services:
 - **Database**: PostgreSQL on Supabase
 - **Redis**: Upstash Redis service
 
-For detailed instructions to help you regarding the deployment of this project, see [deployment.md](docs/deployment.md)
+For detailed instructions to help you regarding the deployment of this project, see [deployment.md](deployment.md)
 
 ## Tech Stack
 

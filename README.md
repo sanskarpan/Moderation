@@ -1,7 +1,5 @@
 # AI-Powered Content Moderation Microservice
 
-![Content Moderation Banner](https://i.imgur.com/VHhlTGQ.png)
-
 A production-ready content moderation microservice that uses AI to detect and flag inappropriate content, built with a modern PERN stack (PostgreSQL, Express, React, Node.js).
 
 
